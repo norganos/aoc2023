@@ -23,7 +23,7 @@ zoneight234
 
     @Test
     fun `example part 1`() {
-        Assertions.assertThat(Day01().test(QuizPart.A, exampleA)).isEqualTo(77)
+        Assertions.assertThat(Day01().test(QuizPart.A, exampleA)).isEqualTo(142)
     }
 
     @Test

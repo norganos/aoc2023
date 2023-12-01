@@ -27,7 +27,7 @@ class ScanningReaderTest {
         val reader = base.scan(listOf(" "))
         val buf = CharArray(10)
         Assertions.assertThat(String(buf, 0, reader.read(buf, 0, 10))).isEqualTo("hallo")
-        Assertions.assertThat(String(buf, 0, reader.read(buf, 0, 10))).isEqualTo("welt")
+        Assertions.assertThat(String(buf, 0, base.read(buf, 0, 10))).isEqualTo("welt")
     }
 
     @Test
