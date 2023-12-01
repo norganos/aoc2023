@@ -4,6 +4,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.lang.Exception
 import java.text.DecimalFormat
+import kotlin.math.max
 import kotlin.math.min
 
 abstract class AbstractFileAdventDay<T>: AdventDay<T> {
@@ -27,7 +28,7 @@ abstract class AbstractFileAdventDay<T>: AdventDay<T> {
     }
 
     fun test(part: QuizPart, input: String): T {
-        return input.reader().buffered(min(input.length, 1024)).use { reader ->
+        return input.reader().buffered(min(max(1, input.length), 1024)).use { reader ->
             callProcess(part, reader)
         }
     }
