@@ -19,48 +19,56 @@ class Day01: AbstractLinesAdventDay<Int>() {
             .sum()
     }
 
-    private val digitNounsPattern = Regex(
-        "one|two|three|four|five|six|seven|eight|nine"
+    private val replacements = listOf(
+        DigitWord("one", "1"),
+        DigitWord("two", "2"),
+        DigitWord("three", "3"),
+        DigitWord("four", "4"),
+        DigitWord("five", "5"),
+        DigitWord("six", "6"),
+        DigitWord("seven", "7"),
+        DigitWord("eight", "8"),
+        DigitWord("nine", "9")
     )
-    private fun getFirstMatch(input: String, maxStart: Int): MatchResult? {
-        val match = digitNounsPattern.find(input)
-        return if (match != null && match.range.first < maxStart)
-            match
-        else null
+
+    private fun replaceFirst(input: String): String {
+        val firstDigit = input.toCharArray().indexOfFirst { it.isDigit() }.let { if (it == -1) input.length else it }
+        return if (firstDigit == 0) input
+        else replacements
+            .mapNotNull {
+                val idx = input.indexOf(it.word)
+                if (idx != -1 && idx < firstDigit) Match(idx, it)
+                else null
+            }
+            .minByOrNull { it.offset }
+            ?.let { resolve(input, it) }
+            ?: input
     }
-    private fun getLastMatch(input: String, minStart: Int): MatchResult? {
-        return (input.length - 3).downTo(minStart).firstNotNullOfOrNull {
-            digitNounsPattern.find(input, it)
-        }
+    private fun replaceLast(input: String): String {
+        val lastDigit = input.toCharArray().indexOfLast { it.isDigit() }.let { if (it == -1) 0 else it }
+        return if (lastDigit == input.length - 1) input
+        else (input.length - 3).downTo(lastDigit)
+            .firstNotNullOfOrNull { idx ->
+                replacements
+                    .firstOrNull { input.indexOf(it.word, idx) != -1 }
+                    ?.let { resolve(input, Match(idx, it)) }
+            }
+            ?: input
     }
-    private fun getReplacement(match: String): String {
-        return when(match) {
-            "nine" -> "9"
-            "eight" -> "8"
-            "seven" -> "7"
-            "six" -> "6"
-            "five" -> "5"
-            "four" -> "4"
-            "three" -> "3"
-            "two" -> "2"
-            "one" -> "1"
-            else -> throw Exception("???")
-        }
-    }
-    private fun replace(input: String, match: MatchResult?): String {
-        return if (match != null)
-            input.substring(0, match.range.first) + getReplacement(match.groupValues.first()) + input.substring(match.range.last + 1)
-        else
-            input
+    private fun resolve(input: String, match: Match): String {
+        return input.replaceRange(match.offset..<match.offset + match.digitWord.word.length, match.digitWord.digit)
     }
     private fun fixLine(part: QuizPart, line: String): String {
         return if (part == QuizPart.A) line
-        else line
-            .let { s ->
-                replace(s, getFirstMatch(s, s.toCharArray().indexOfFirst { it.isDigit() }))
-            }
-            .let { s ->
-                replace(s, getLastMatch(s, s.toCharArray().indexOfLast { it.isDigit() }))
-            }
+        else replaceLast(replaceFirst(line))
     }
+
+    data class DigitWord(
+        val word: String,
+        val digit: String
+    )
+    data class Match(
+        val offset: Int,
+        val digitWord: DigitWord
+    )
 }
