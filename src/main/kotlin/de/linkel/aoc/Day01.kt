@@ -19,9 +19,18 @@ class Day01: AbstractLinesAdventDay<Int>() {
             .sum()
     }
 
-    private val digitNounsPattern = Regex(
-        "one|two|three|four|five|six|seven|eight|nine"
+    private val replacements = mapOf(
+        "nine" to "9",
+        "eight" to "8",
+        "seven" to "7",
+        "six" to "6",
+        "five" to "5",
+        "four" to "4",
+        "three" to "3",
+        "two" to "2",
+        "one" to "1"
     )
+    private val digitNounsPattern = Regex(replacements.entries.joinToString("|") { it.key })
     private fun getFirstMatch(input: String, maxStart: Int): MatchResult? {
         val match = digitNounsPattern.find(input)
         return if (match != null && match.range.first < maxStart)
@@ -34,18 +43,7 @@ class Day01: AbstractLinesAdventDay<Int>() {
         }
     }
     private fun getReplacement(match: String): String {
-        return when(match) {
-            "nine" -> "9"
-            "eight" -> "8"
-            "seven" -> "7"
-            "six" -> "6"
-            "five" -> "5"
-            "four" -> "4"
-            "three" -> "3"
-            "two" -> "2"
-            "one" -> "1"
-            else -> throw Exception("???")
-        }
+        return replacements[match] ?: throw Exception("???")
     }
     private fun replace(input: String, match: MatchResult?): String {
         return if (match != null)
