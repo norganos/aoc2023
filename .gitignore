@@ -37,3 +37,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### personal input data ###
+src/main/resources/input*.txt

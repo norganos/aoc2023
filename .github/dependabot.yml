@@ -1,0 +1,18 @@
+version: 2
+registries:
+  maven-github:
+    type: maven-repository
+    url: https://maven.pkg.github.com/versicherungskammer/shared-libs
+    username: dummy
+    password: ${{secrets.VKB_GITHUB_DEPS_TOKEN}}
+updates:
+  - package-ecosystem: "gradle"
+    directory: /
+    schedule:
+      interval: "weekly"
+    registries:
+      - maven-github
+  - package-ecosystem: "github-actions"
+    directory: /
+    schedule:
+      interval: "weekly"

@@ -13,7 +13,16 @@ group = "com.example"
 
 val kotlinVersion=project.properties.get("kotlinVersion")
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/norganos/aoc-utils")
+        credentials {
+            username = project.findProperty("github.registry.user")?.toString() ?: System.getenv("GITHUB_ACTOR") ?: "nobody"
+            password = project.findProperty("github.registry.key")?.toString() ?: System.getenv("GITHUB_TOKEN") ?: "none"
+        }
+    }
 }
 
 dependencies {
@@ -25,6 +34,7 @@ dependencies {
     implementation("io.micronaut.serde:micronaut-serde-jackson")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    implementation("de.linkel.aoc:aoc-utils:1.0.0")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("org.assertj:assertj-core:3.24.2")
