@@ -1,30 +1,13 @@
 package de.linkel.aoc
 
-import de.linkel.aoc.base.QuizPart
-import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.Test
-
-class Day03Test {
-    val example = """
+class Day03Test: AbstractDayTest<Int>() {
+    override val exampleA = """
         """.trimIndent()
+    override val exampleSolutionA = 0
+    override val solutionA = 0
 
-    @Test
-    fun `example part 1`() {
-        Assertions.assertThat(Day03().test(QuizPart.A, example)).isEqualTo(0)
-    }
+    override val exampleSolutionB = 0
+    override val solutionB = 0
 
-    @Test
-    fun `example part 2`() {
-        Assertions.assertThat(Day03().test(QuizPart.B, example)).isEqualTo(0)
-    }
-
-    @Test
-    fun `solution part 1`() {
-        Assertions.assertThat(Day03().solve(QuizPart.A)).isEqualTo(0)
-    }
-
-    @Test
-    fun `solution part 2`() {
-        Assertions.assertThat(Day03().solve(QuizPart.B)).isEqualTo(0)
-    }
+    override val implementation = Day03()
 }

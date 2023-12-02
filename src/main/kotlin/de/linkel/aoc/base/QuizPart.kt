@@ -1,7 +1,7 @@
 package de.linkel.aoc.base
 
 enum class QuizPart(
-    val prefix: String
+    val postfix: String
 ) {
     A("a"),
     B("b");

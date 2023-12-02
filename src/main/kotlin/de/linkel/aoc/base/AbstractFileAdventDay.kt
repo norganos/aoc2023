@@ -2,7 +2,6 @@ package de.linkel.aoc.base
 
 import java.io.BufferedReader
 import java.io.File
-import java.lang.Exception
 import java.text.DecimalFormat
 import kotlin.math.max
 import kotlin.math.min
@@ -10,24 +9,22 @@ import kotlin.math.min
 abstract class AbstractFileAdventDay<T>: AdventDay<T> {
     private val msFormat = DecimalFormat("#,##0")
 
-    companion object {
-        fun from(args: List<String>, name1: String, name2: String): BufferedReader {
-            return if (args.isNotEmpty())
-                File(args.first()).bufferedReader()
-            else {
-                val resource = AbstractFileAdventDay::class.java.getResourceAsStream("/$name1") ?: AbstractFileAdventDay::class.java.getResourceAsStream("/$name2")
-                resource?.bufferedReader() ?: throw Exception("could not find resource $name1 or $name2")
-            }
+    private fun getInput(part: QuizPart, args: List<String>): BufferedReader {
+        return if (args.isNotEmpty())
+            File(args.first()).bufferedReader()
+        else {
+            val resource = AbstractFileAdventDay::class.java.getResourceAsStream(String.format("/input%02d%s.txt", day, part.postfix)) ?: AbstractFileAdventDay::class.java.getResourceAsStream(String.format("/input%02d.txt", day))
+            resource?.bufferedReader() ?: throw InputDataNotFoundException(day, part)
         }
     }
 
     override fun solve(part: QuizPart, args: List<String>): T {
-        return from(args, String.format("input%02d%s.txt", day, part.prefix), String.format("input%02d.txt", day)).use { reader ->
+        return getInput(part, args).use { reader ->
             callProcess(part, reader)
         }
     }
 
-    fun test(part: QuizPart, input: String): T {
+    override fun test(part: QuizPart, input: String): T {
         return input.reader().buffered(min(max(1, input.length), 1024)).use { reader ->
             callProcess(part, reader)
         }
@@ -44,4 +41,5 @@ abstract class AbstractFileAdventDay<T>: AdventDay<T> {
     }
 
     protected abstract fun process(part: QuizPart, reader: BufferedReader): T
+
 }
