@@ -9,7 +9,6 @@ import kotlin.math.min
 @Singleton
 class Day01: AbstractLinesAdventDay<Int>() {
     override val day = 1
-    override val parts = QuizPart.BOTH
 
     override fun process(part: QuizPart, lines: Sequence<String>): Int {
         return lines

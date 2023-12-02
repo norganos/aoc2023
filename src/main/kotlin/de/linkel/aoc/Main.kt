@@ -1,6 +1,7 @@
 package de.linkel.aoc
 
 import de.linkel.aoc.base.AdventDay
+import de.linkel.aoc.base.QuizPart
 import io.micronaut.configuration.picocli.PicocliRunner
 import jakarta.inject.Inject
 import picocli.CommandLine.Command
@@ -31,7 +32,7 @@ class Main : Runnable {
             println("implementation for day $day not found")
             exitProcess(1)
         }
-        for (part in adventDay.parts) {
+        for (part in QuizPart.entries) {
             adventDay.solve(part, args)
         }
     }

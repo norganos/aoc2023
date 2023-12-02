@@ -8,7 +8,6 @@ import java.lang.Exception
 @Singleton
 class Day02: AbstractLinesAdventDay<Int>() {
     override val day = 2
-    override val parts = QuizPart.BOTH
 
     override fun process(part: QuizPart, lines: Sequence<String>): Int {
         val linePattern = Regex("Game ([0-9]+): (.+)")
