@@ -11,39 +11,32 @@ class Day04: AbstractLinesAdventDay<Int>() {
 
     override fun process(part: QuizPart, lines: Sequence<String>): Int {
         val pattern = Regex("Card +([0-9]+): ([0-9 ]+) \\| ([0-9 ]+)")
-        val cards = lines
+        val winningNumbers = lines
             .mapNotNull { pattern.matchEntire(it) }
             .map { match ->
                 val winners = match.groupValues[2].split(" ").filter { it.isNotEmpty() }.map { it.toInt() }.toSet()
                 val numbers = match.groupValues[3].split(" ").filter { it.isNotEmpty() }.map { it.toInt() }.toSet()
-
-                ScoreCard(
-                    number = match.groupValues[1].toInt(),
-                    winningNumbers = winners.intersect(numbers)
-                )
+                winners.intersect(numbers)
             }
-        return if (part == QuizPart.A) cards.sumOf { it.points }
+        return if (part == QuizPart.A)
+            winningNumbers
+                .filter { it.isNotEmpty() }
+                .sumOf { 2f.pow(it.size - 1).toInt() }
         else {
-            val mapped = cards.associateBy { it.number }.toMutableMap()
-            mapped.keys.sorted().toList()
-                .forEach { nr ->
-                    val card = mapped[nr]!!
-                    (1..(card.winningNumbers.size))
-                        .map { card.number + it }
-                        .mapNotNull { mapped[it] }
-                        .forEach {
-                            mapped[it.number] = it.copy(count = it.count + card.count)
-                        }
+            winningNumbers.foldIndexed(mutableMapOf<Int, Int>()) { idx, map, card ->
+                val count = map[idx] ?: 1
+                if (!map.containsKey(idx)) {
+                    map[idx] = 1
+                }
+                if (card.isNotEmpty()) {
+                    (1..(card.size)).forEach {
+                        map[idx + it] = (map[idx + it] ?: 1) + count
+                    }
+                }
+                map
             }
-            return mapped.values.sumOf { it.count }
+                .values
+                .sumOf { it }
         }
-    }
-
-    data class ScoreCard(
-        val number: Int,
-        val winningNumbers: Set<Int>,
-        val count: Int = 1
-    ) {
-        val points = if (winningNumbers.isNotEmpty()) 2f.pow(winningNumbers.size - 1).toInt() else 0
     }
 }
