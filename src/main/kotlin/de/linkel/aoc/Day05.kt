@@ -29,7 +29,7 @@ class Day05: AbstractLinesAdventDay<Long>() {
         val iterator = lines.iterator()
         val seedsLineValues = iterator.next().substringAfter(":").split(spaces).filter { it.isNotEmpty() }.map { it.toLong() }
         val seeds = if (part == QuizPart.A) seedsLineValues.map { LongRange(it, it) }
-                else seedsLineValues.chunked(2).map { LongRange(it[0], it[0] + it[1] - 1) }
+                else seedsLineValues.chunked(2).map { (from, count) -> LongRange(from, from + count - 1) }
 
         return iterator.asSequence()
             .fold(State(seeds)) { state, line ->
