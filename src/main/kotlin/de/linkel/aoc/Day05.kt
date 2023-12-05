@@ -20,9 +20,9 @@ class Day05: AbstractLinesAdventDay<Long>() {
             translation = translation + Mapping.of(line)
         )
         fun translate(): State = copy(
-            allowedRanges = translation.fillSpaces().filter(allowedRanges).destRanges,
-            translation = Translation()
-        )
+                allowedRanges = translation.filter(allowedRanges).destRanges,
+                translation = Translation()
+            )
     }
 
     override fun process(part: QuizPart, lines: Sequence<String>): Long {
@@ -49,37 +49,6 @@ class Day05: AbstractLinesAdventDay<Long>() {
             mappings = mappings + listOf(mapping)
         )
 
-        fun fillSpaces(): Translation {
-            var maxLast = -1L
-
-            val newMappings = mappings.toMutableList()
-            val blackMappings = mappings.flatMap { listOf(it.sourceRange, it.destRange) }
-            while (true) {
-                val minFirst = blackMappings
-                    .filter { it.first > maxLast }
-                    .minOfOrNull { it.first }
-                if (minFirst == null) {
-                    newMappings.add(Mapping(LongRange(maxLast + 1, Long.MAX_VALUE), LongRange(maxLast + 1, Long.MAX_VALUE)))
-                    break
-                }
-                if (minFirst - 1 >= maxLast + 1) {
-                    newMappings.add(
-                        Mapping(
-                            LongRange(maxLast + 1, minFirst - 1),
-                            LongRange(maxLast + 1, minFirst - 1)
-                        )
-                    )
-                }
-                maxLast = blackMappings
-                    .filter { it.last > minFirst && it.last > minFirst }
-                    .minOfOrNull { it.last } ?: Long.MAX_VALUE
-                if (maxLast == Long.MAX_VALUE) {
-                    break
-                }
-            }
-            return Translation(newMappings.toList())
-        }
-
         fun filter(sourceRanges: Collection<LongRange>): Translation {
             return Translation(
                 sourceRanges.flatMap { sourceRange ->
@@ -96,7 +65,13 @@ class Day05: AbstractLinesAdventDay<Long>() {
                                 destRange = newDest
                             )
                         }
-                }
+                } + mappings
+                    .flatMap { listOf(it.sourceRange, it.destRange) }
+                    .fold(sourceRanges) { remainders, range ->
+                        remainders
+                            .flatMap { it - range }
+                    }
+                    .map { Mapping(it, it) }
             )
         }
 
@@ -119,6 +94,15 @@ class Day05: AbstractLinesAdventDay<Long>() {
         }
     }
 }
+
 fun LongRange.intersects(other: LongRange): Boolean {
     return (this.first <= other.first && this.last >= other.first) || (other.first <= this.first && other.last >= this.first)
+}
+
+operator fun LongRange.minus(other: LongRange): List<LongRange> {
+    return if (this.first >= other.first && this.last <= other.last) emptyList() // we are completely inside the other -> nothing left
+    else if (this.first < other.first && this.last > other.last) listOf(LongRange(this.first, other.first - 1), LongRange(other.last + 1, this.last)) // other is inside of us -> other cuts us in 2 parts
+    else if (this.first < other.first && this.last > other.first) listOf(LongRange(this.first, other.first - 1)) // other cuts our upper end
+    else if (this.last > other.last && this.first < other.last) listOf(LongRange(other.last + 1, this.last)) // other cuts our lower end
+    else listOf(this) // no intersection -> we stay the same
 }
