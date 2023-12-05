@@ -24,23 +24,40 @@ class Day05: AbstractLinesAdventDay<Long>() {
         val temperatureToHumidity = consumeUntilDelimiter(iterator, "humidity-to-location map:")
         val humidityToLocation = consumeUntilDelimiter(iterator, "EOF")
 
-        return seeds.minOf { seedRange ->
-            seedRange.minOf { seed ->
-                humidityToLocation.lookup(
-                        temperatureToHumidity.lookup(
-                            lightToTemperature.lookup(
-                                waterToLight.lookup(
-                                    fertilizerToWater.lookup(
-                                        soilToFertilizer.lookup(
-                                            seedToSoil.lookup(seed)
-                                        )
+        return LongRange(0, Long.MAX_VALUE)
+            .first { loc ->
+                val seed = seedToSoil.reverseLookup(
+                    soilToFertilizer.reverseLookup(
+                        fertilizerToWater.reverseLookup(
+                            waterToLight.reverseLookup(
+                                lightToTemperature.reverseLookup(
+                                    temperatureToHumidity.reverseLookup(
+                                        humidityToLocation.reverseLookup(loc)
                                     )
                                 )
                             )
                         )
                     )
-                }
+                )
+                seeds.any { seed in it }
             }
+//        return seeds.minOf { seedRange ->
+//            seedRange.minOf { seed ->
+//                humidityToLocation.lookup(
+//                        temperatureToHumidity.lookup(
+//                            lightToTemperature.lookup(
+//                                waterToLight.lookup(
+//                                    fertilizerToWater.lookup(
+//                                        soilToFertilizer.lookup(
+//                                            seedToSoil.lookup(seed)
+//                                        )
+//                                    )
+//                                )
+//                            )
+//                        )
+//                    )
+//                }
+//            }
     }
 
     private fun consumeUntilDelimiter(iterator: Iterator<String>, delimiter: String): Translation {
@@ -67,6 +84,14 @@ class Day05: AbstractLinesAdventDay<Long>() {
             for (mapping in mappings) {
                 if (input in mapping.sourceRange) {
                     return mapping.destRange.first + (input - mapping.sourceRange.first)
+                }
+            }
+            return input
+        }
+        fun reverseLookup(input: Long): Long {
+            for (mapping in mappings) {
+                if (input in mapping.destRange) {
+                    return mapping.sourceRange.first + (input - mapping.destRange.first)
                 }
             }
             return input

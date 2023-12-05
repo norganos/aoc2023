@@ -40,7 +40,7 @@ humidity-to-location map:
     override val solutionA = 107430936L
 
     override val exampleSolutionB = 46L
-    override val solutionB = 0L
+    override val solutionB = 23738616L
 
     override val implementation = Day05()
 }
