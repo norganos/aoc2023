@@ -3,6 +3,8 @@ package de.linkel.aoc
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
 import jakarta.inject.Singleton
+import kotlin.math.max
+import kotlin.math.min
 
 @Singleton
 class Day05: AbstractLinesAdventDay<Long>() {
@@ -24,42 +26,46 @@ class Day05: AbstractLinesAdventDay<Long>() {
         val temperatureToHumidity = consumeUntilDelimiter(iterator, "humidity-to-location map:")
         val humidityToLocation = consumeUntilDelimiter(iterator, "EOF")
 
-        return LongRange(0, Long.MAX_VALUE)
-            .first { loc ->
-                val seed = seedToSoil.reverseLookup(
-                    soilToFertilizer.reverseLookup(
-                        fertilizerToWater.reverseLookup(
-                            waterToLight.reverseLookup(
-                                lightToTemperature.reverseLookup(
-                                    temperatureToHumidity.reverseLookup(
-                                        humidityToLocation.reverseLookup(loc)
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-                seeds.any { seed in it }
-            }
-//        return seeds.minOf { seedRange ->
-//            seedRange.minOf { seed ->
-//                humidityToLocation.lookup(
-//                        temperatureToHumidity.lookup(
-//                            lightToTemperature.lookup(
-//                                waterToLight.lookup(
-//                                    fertilizerToWater.lookup(
-//                                        soilToFertilizer.lookup(
-//                                            seedToSoil.lookup(seed)
-//                                        )
-//                                    )
-//                                )
-//                            )
-//                        )
-//                    )
-//                }
-//            }
+        return seeds
+            .filterTranslation(
+                seedToSoil
+                    .fillSpaces()
+            )
+            .destRanges
+            .filterTranslation(
+                soilToFertilizer
+                    .fillSpaces()
+            )
+            .destRanges
+            .filterTranslation(
+                fertilizerToWater
+                    .fillSpaces()
+            )
+            .destRanges
+            .filterTranslation(
+                waterToLight
+                    .fillSpaces()
+            )
+            .destRanges
+            .filterTranslation(
+                lightToTemperature
+                    .fillSpaces()
+            )
+            .destRanges
+            .filterTranslation(
+                temperatureToHumidity
+                    .fillSpaces()
+            )
+            .destRanges
+            .filterTranslation(
+                humidityToLocation
+                    .fillSpaces()
+            )
+            .destRanges
+            .minOf { it.first }
     }
 
+    
     private fun consumeUntilDelimiter(iterator: Iterator<String>, delimiter: String): Translation {
         val result = mutableListOf<Mapping>()
         while (iterator.hasNext()) {
@@ -80,26 +86,69 @@ class Day05: AbstractLinesAdventDay<Long>() {
     data class Translation(
         val mappings: List<Mapping>
     ) {
-        fun lookup(input: Long): Long {
-            for (mapping in mappings) {
-                if (input in mapping.sourceRange) {
-                    return mapping.destRange.first + (input - mapping.sourceRange.first)
+        fun fillSpaces(): Translation {
+            var maxLast = -1L
+
+            val newMappings = mappings.toMutableList()
+            val blackMappings = mappings.flatMap { listOf(it.sourceRange, it.destRange) }
+            while (true) {
+                val minFirst = blackMappings
+                    .filter { it.first > maxLast }
+                    .minOfOrNull { it.first }
+                if (minFirst == null) {
+                    newMappings.add(Mapping(LongRange(maxLast + 1, Long.MAX_VALUE), LongRange(maxLast + 1, Long.MAX_VALUE)))
+                    break
+                }
+                if (minFirst - 1 >= maxLast + 1) {
+                    newMappings.add(
+                        Mapping(
+                            LongRange(maxLast + 1, minFirst - 1),
+                            LongRange(maxLast + 1, minFirst - 1)
+                        )
+                    )
+                }
+                maxLast = blackMappings
+                    .filter { it.last > minFirst && it.last > minFirst }
+                    .minOfOrNull { it.last } ?: Long.MAX_VALUE
+                if (maxLast == Long.MAX_VALUE) {
+                    break
                 }
             }
-            return input
+            return Translation(newMappings.toList())
         }
-        fun reverseLookup(input: Long): Long {
-            for (mapping in mappings) {
-                if (input in mapping.destRange) {
-                    return mapping.sourceRange.first + (input - mapping.destRange.first)
+
+        fun filter(sourceRanges: Collection<LongRange>): Translation {
+            return Translation(
+                sourceRanges.flatMap { sourceRange ->
+                    mappings
+                        .filter { sourceRange.intersects(it.sourceRange) }
+                        .map { mapping ->
+                            val fromValue = max(sourceRange.first, mapping.sourceRange.first)
+                            val toValue = min(sourceRange.last, mapping.sourceRange.last)
+                            val offset = mapping.destRange.first - mapping.sourceRange.first
+                            val newSource = LongRange(fromValue, toValue)
+                            val newDest = LongRange(fromValue + offset, toValue + offset)
+                            Mapping(
+                                sourceRange = newSource,
+                                destRange = newDest
+                            )
+                        }
                 }
-            }
-            return input
+            )
         }
+
+        val destRanges: Collection<LongRange> = mappings.map { it.destRange }
     }
 
     data class Mapping(
         val sourceRange: LongRange,
         val destRange: LongRange
     )
+
+    private fun Collection<LongRange>.filterTranslation(translation: Translation): Translation {
+        return translation.filter(this)
+    }
+}
+fun LongRange.intersects(other: LongRange): Boolean {
+    return (this.first <= other.first && this.last >= other.first) || (other.first <= this.first && other.last >= this.first)
 }

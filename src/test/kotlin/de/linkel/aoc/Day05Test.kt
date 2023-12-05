@@ -37,10 +37,10 @@ humidity-to-location map:
 56 93 4
         """.trimIndent()
     override val exampleSolutionA = 35L
-    override val solutionA = 107430936L
+    override val solutionA = 107430936L // 22s
 
     override val exampleSolutionB = 46L
-    override val solutionB = 23738616L
+    override val solutionB = 23738616L // 3s
 
     override val implementation = Day05()
 }
