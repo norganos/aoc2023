@@ -23,18 +23,19 @@ class Day04: AbstractLinesAdventDay<Int>() {
                 .filter { it.isNotEmpty() }
                 .sumOf { 2f.pow(it.size - 1).toInt() }
         else {
-            winningNumbers.foldIndexed(mutableMapOf<Int, Int>()) { idx, map, card ->
-                val count = map[idx] ?: 1
-                if (!map.containsKey(idx)) {
-                    map[idx] = 1
-                }
-                if (card.isNotEmpty()) {
-                    (1..(card.size)).forEach {
-                        map[idx + it] = (map[idx + it] ?: 1) + count
+            winningNumbers
+                .foldIndexed(mutableMapOf<Int, Int>()) { idx, map, card ->
+                    val count = map[idx] ?: 1
+                    if (!map.containsKey(idx)) {
+                        map[idx] = 1
                     }
+                    if (card.isNotEmpty()) {
+                        (1..(card.size)).forEach {
+                            map[idx + it] = (map[idx + it] ?: 1) + count
+                        }
+                    }
+                    map
                 }
-                map
-            }
                 .values
                 .sumOf { it }
         }

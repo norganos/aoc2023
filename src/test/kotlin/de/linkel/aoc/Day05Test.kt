@@ -2,7 +2,7 @@ package de.linkel.aoc
 
 class Day05Test: AbstractDayTest<Long>() {
     override val exampleA = """
-seeds: 79 14 55 13
+seeds: 79 14 55 13      27
 
 seed-to-soil map:
 50 98 2

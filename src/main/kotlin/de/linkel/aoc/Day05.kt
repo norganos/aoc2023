@@ -29,7 +29,7 @@ class Day05: AbstractLinesAdventDay<Long>() {
         val iterator = lines.iterator()
         val seedsLineValues = iterator.next().substringAfter(":").split(spaces).filter { it.isNotEmpty() }.map { it.toLong() }
         val seeds = if (part == QuizPart.A) seedsLineValues.map { LongRange(it, it) }
-                else seedsLineValues.windowed(2, step = 2).map { LongRange(it[0], it[0] + it[1] - 1) }
+                else seedsLineValues.chunked(2).map { LongRange(it[0], it[0] + it[1] - 1) }
 
         return iterator.asSequence()
             .fold(State(seeds)) { state, line ->
@@ -55,11 +55,8 @@ class Day05: AbstractLinesAdventDay<Long>() {
                     mappings
                         .filter { sourceRange.intersects(it.sourceRange) }
                         .map { mapping ->
-                            val fromValue = max(sourceRange.first, mapping.sourceRange.first)
-                            val toValue = min(sourceRange.last, mapping.sourceRange.last)
-                            val offset = mapping.destRange.first - mapping.sourceRange.first
-                            val newSource = LongRange(fromValue, toValue)
-                            val newDest = LongRange(fromValue + offset, toValue + offset)
+                            val newSource = sourceRange.intersect(mapping.sourceRange)
+                            val newDest = newSource.move(mapping.destRange.first - mapping.sourceRange.first)
                             Mapping(
                                 sourceRange = newSource,
                                 destRange = newDest
@@ -97,6 +94,12 @@ class Day05: AbstractLinesAdventDay<Long>() {
 
 fun LongRange.intersects(other: LongRange): Boolean {
     return (this.first <= other.first && this.last >= other.first) || (other.first <= this.first && other.last >= this.first)
+}
+fun LongRange.intersect(other: LongRange): LongRange {
+    return LongRange(max(this.first, other.first), min(this.last, other.last))
+}
+fun LongRange.move(offset: Long): LongRange {
+    return LongRange(this.first + offset, this.last + offset)
 }
 
 operator fun LongRange.minus(other: LongRange): List<LongRange> {
