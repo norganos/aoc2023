@@ -3,6 +3,7 @@ package de.linkel.aoc
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
 import jakarta.inject.Singleton
+import java.lang.Exception
 import kotlin.math.max
 import kotlin.math.min
 
@@ -11,81 +12,43 @@ class Day05: AbstractLinesAdventDay<Long>() {
     override val day = 5
     private val spaces = Regex("\\s+")
 
+    data class State(
+        val allowedRanges: Collection<LongRange>,
+        val translation: Translation = Translation()
+    ) {
+        operator fun plus(line: String): State = copy(
+            translation = translation + Mapping.of(line)
+        )
+        fun translate(): State = copy(
+            allowedRanges = translation.fillSpaces().filter(allowedRanges).destRanges,
+            translation = Translation()
+        )
+    }
+
     override fun process(part: QuizPart, lines: Sequence<String>): Long {
         val iterator = lines.iterator()
         val seedsLineValues = iterator.next().substringAfter(":").split(spaces).filter { it.isNotEmpty() }.map { it.toLong() }
         val seeds = if (part == QuizPart.A) seedsLineValues.map { LongRange(it, it) }
                 else seedsLineValues.windowed(2, step = 2).map { LongRange(it[0], it[0] + it[1] - 1) }
-        iterator.next()
-        assert(iterator.next().trim() == "seed-to-soil map:")
-        val seedToSoil = consumeUntilDelimiter(iterator, "soil-to-fertilizer map:")
-        val soilToFertilizer = consumeUntilDelimiter(iterator, "fertilizer-to-water map:")
-        val fertilizerToWater = consumeUntilDelimiter(iterator, "water-to-light map:")
-        val waterToLight = consumeUntilDelimiter(iterator, "light-to-temperature map:")
-        val lightToTemperature = consumeUntilDelimiter(iterator, "temperature-to-humidity map:")
-        val temperatureToHumidity = consumeUntilDelimiter(iterator, "humidity-to-location map:")
-        val humidityToLocation = consumeUntilDelimiter(iterator, "EOF")
 
-        return seeds
-            .filterTranslation(
-                seedToSoil
-                    .fillSpaces()
-            )
-            .destRanges
-            .filterTranslation(
-                soilToFertilizer
-                    .fillSpaces()
-            )
-            .destRanges
-            .filterTranslation(
-                fertilizerToWater
-                    .fillSpaces()
-            )
-            .destRanges
-            .filterTranslation(
-                waterToLight
-                    .fillSpaces()
-            )
-            .destRanges
-            .filterTranslation(
-                lightToTemperature
-                    .fillSpaces()
-            )
-            .destRanges
-            .filterTranslation(
-                temperatureToHumidity
-                    .fillSpaces()
-            )
-            .destRanges
-            .filterTranslation(
-                humidityToLocation
-                    .fillSpaces()
-            )
-            .destRanges
+        return iterator.asSequence()
+            .fold(State(seeds)) { state, line ->
+                if (line.isEmpty()) state
+                else if (line.endsWith("map:")) state.translate()
+                else state + line
+            }
+            .translate()
+            .allowedRanges
             .minOf { it.first }
     }
 
-    
-    private fun consumeUntilDelimiter(iterator: Iterator<String>, delimiter: String): Translation {
-        val result = mutableListOf<Mapping>()
-        while (iterator.hasNext()) {
-            val line = iterator.next().trim()
-            if (line.isEmpty()) continue
-            if (line == delimiter) break
-            val vals = line.split(spaces).map { it.trim().toLong() }
-            result.add(
-                Mapping(
-                    destRange = LongRange(vals[0], vals[0] + vals[2] - 1),
-                    sourceRange = LongRange(vals[1], vals[1] + vals[2] - 1)
-                )
-            )
-        }
-        return Translation(result)
-    }
-
     data class Translation(
-        val mappings: List<Mapping>
+        val mappings: List<Mapping> = emptyList()
     ) {
+        operator fun plus(mapping: Mapping) = copy(
+            mappings = mappings + listOf(mapping)
+        )
+
         fun fillSpaces(): Translation {
             var maxLast = -1L
 
@@ -143,10 +106,17 @@ class Day05: AbstractLinesAdventDay<Long>() {
     data class Mapping(
         val sourceRange: LongRange,
         val destRange: LongRange
-    )
-
-    private fun Collection<LongRange>.filterTranslation(translation: Translation): Translation {
-        return translation.filter(this)
+    ) {
+        companion object {
+            private val pattern = Regex("(\\d+)\\s+(\\d+)\\s+(\\d+)")
+            fun of(line: String): Mapping {
+                val match = pattern.matchEntire(line) ?: throw Exception("invalid line format")
+                return Mapping(
+                    destRange = LongRange(match.groupValues[1].toLong(), match.groupValues[1].toLong() + match.groupValues[3].toLong() - 1),
+                    sourceRange = LongRange(match.groupValues[2].toLong(), match.groupValues[2].toLong() + match.groupValues[3].toLong() - 1)
+                )
+            }
+        }
     }
 }
 fun LongRange.intersects(other: LongRange): Boolean {
