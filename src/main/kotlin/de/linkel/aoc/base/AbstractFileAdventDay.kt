@@ -5,9 +5,10 @@ import java.io.File
 import java.text.DecimalFormat
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.measureTimedValue
 
 abstract class AbstractFileAdventDay<T>: AdventDay<T> {
-    private val msFormat = DecimalFormat("#,##0")
+    private val msFormat = DecimalFormat("#,##0.0")
 
     private fun getInput(part: QuizPart, args: List<String>): BufferedReader {
         return if (args.isNotEmpty())
@@ -32,12 +33,12 @@ abstract class AbstractFileAdventDay<T>: AdventDay<T> {
 
     private fun callProcess(part: QuizPart, reader: BufferedReader): T {
         println("solving AoC 2023 Day $day $part")
-        val start = System.currentTimeMillis()
-        val solution = process(part, reader)
-        val duration = System.currentTimeMillis() - start
-        println("Solution is $solution")
-        println ("calculation took ${msFormat.format(duration)}ms")
-        return solution
+        val result = measureTimedValue {
+            process(part, reader)
+        }
+        println("Solution is $${result.value}")
+        println ("calculation took ${msFormat.format(result.duration.inWholeMicroseconds / 1000F)}ms")
+        return result.value
     }
 
     protected abstract fun process(part: QuizPart, reader: BufferedReader): T
