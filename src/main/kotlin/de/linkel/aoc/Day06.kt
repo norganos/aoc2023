@@ -3,6 +3,9 @@ package de.linkel.aoc
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
 import jakarta.inject.Singleton
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.sqrt
 
 @Singleton
 class Day06: AbstractLinesAdventDay<Long>() {
@@ -25,12 +28,15 @@ class Day06: AbstractLinesAdventDay<Long>() {
         return races.fold(1) { p, r -> p * getPossibleWins(r) }
     }
 
+    private fun ceil2(input: Double): Long {
+        return if (ceil(input) == input) ceil(input + 1).toLong() else ceil(input).toLong()
+    }
+    private fun floor2(input: Double): Long {
+        return if (ceil(input) == input) floor(input - 1).toLong() else floor(input).toLong()
+    }
+
     private fun getPossibleWins(race: Pair<Long,Long>): Long {
-        return (1L until race.first).fold(0L) { s, ms ->
-            val speed = ms
-            val remaining = race.first - ms
-            val distance = speed * remaining
-            if (distance > race.second) s + 1 else s
-        }
+        val disc = sqrt((race.first * race.first - 4 * race.second).toDouble())
+        return floor2((disc + race.first) / 2) - ceil2((- disc + race.first) / 2) + 1
     }
 }
