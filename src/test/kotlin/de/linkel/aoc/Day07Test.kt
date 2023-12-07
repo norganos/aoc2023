@@ -16,3 +16,17 @@ QQQJA 483
 
     override val implementation = Day07()
 }
+/*
+solving AoC 2023 Day 7 A
+Solution is 6440
+calculation took 21,7ms
+solving AoC 2023 Day 7 B
+Solution is 5905
+calculation took 0,8ms
+solving AoC 2023 Day 7 A
+Solution is 251287184
+calculation took 58,0ms
+solving AoC 2023 Day 7 B
+Solution is 250757288
+calculation took 7,9ms
+ */

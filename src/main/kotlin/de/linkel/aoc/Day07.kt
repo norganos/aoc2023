@@ -102,3 +102,26 @@ class Day07: AbstractLinesAdventDay<Long>() {
             .sum()
     }
 }
+
+/*
+ // variant: transform input hand (5 chars 0-9,T,J,Q,K,A) into a 6-char string with 1 character 1-7 for type, and 5 chars a-o (mapped from 0-9,T,J,Q,K,A)
+ // so that usual string comparison sorts the hands correctly
+            ...
+                val _card = hand.toCharArray()
+                    .map { c ->
+                        if (c.isDigit()) c + 49 // 0-9 => a-j
+                        else when (c) {
+                            'T' -> 'k'
+                            'J' -> if (part == QuizPart.A) 'l' else 'a'
+                            'Q' -> 'm'
+                            'K' -> 'n'
+                            'A' -> 'o'
+                            else -> throw Exception("invalid card $c")
+                        }
+                    }
+                Pair("${Type.entries.size - type.ordinal}${_card}", bid.toLong())
+            }
+            .sortedBy { it.first }
+            .mapIndexed { idx, (_, bid) ->  bid * (idx + 1) }
+            .sum()
+ */
