@@ -36,7 +36,7 @@ abstract class AbstractFileAdventDay<T>: AdventDay<T> {
         val result = measureTimedValue {
             process(part, reader)
         }
-        println("Solution is $${result.value}")
+        println("Solution is ${result.value}")
         println ("calculation took ${msFormat.format(result.duration.inWholeMicroseconds / 1000F)}ms")
         return result.value
     }

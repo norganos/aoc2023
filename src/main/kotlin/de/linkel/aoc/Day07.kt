@@ -93,8 +93,8 @@ class Day07: AbstractLinesAdventDay<Long>() {
             .sortedWith { a, b ->
                 b.type.compareTo(a.type)
                     .takeIf { it != 0 }
-                    ?: (0..4).firstNotNullOfOrNull { i ->
-                        a.values[i].compareTo(b.values[i])
+                    ?: a.values.zip(b.values).firstNotNullOfOrNull { (ca, cb) ->
+                        ca.compareTo(cb)
                             .takeIf { it != 0 }
                     } ?: 0
             }
