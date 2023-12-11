@@ -10,7 +10,7 @@ class Day11: AbstractLinesAdventDay<Long>() {
     override val day = 11
 
     override fun process(part: QuizPart, lines: Sequence<String>): Long {
-        val galaxies = lines
+        return lines
             .flatMapIndexed { y, line ->
                 line.toCharArray()
                     .mapIndexed { x, c ->
@@ -29,11 +29,11 @@ class Day11: AbstractLinesAdventDay<Long>() {
                     val xx = (0 until width).filter { x ->
                             points.none { it.x == x }
                         }
-                        .sortedDescending()
+                        .toList()
                     val yy = (0 until height).filter { y ->
                             points.none { it.y == y }
                         }
-                        .sortedDescending()
+                        .toList()
                     points.map { p ->
                         Point(
                             p.x + xx.count { it < p.x } * expansionFactor,
@@ -42,14 +42,28 @@ class Day11: AbstractLinesAdventDay<Long>() {
                     }
                 }
                 .toList()
-        return galaxies
-                .flatMapIndexed { idx, galaxy ->
-                    galaxies
-                        .drop(idx + 1)
-                        .map {
-                            (it - galaxy).manhattenDistance.toLong()
+                .combinationPairs(
+                    withSelf = false,
+                    withMirrors = false
+                )
+                .sumOf { (it.first - it.second).manhattenDistance.toLong() }
+    }
+}
+fun <T> List<T>.combinationPairs(
+    withSelf: Boolean = false,
+    withMirrors: Boolean = false
+): Sequence<Pair<T,T>> {
+    val size = this.size
+    val list = this
+    return sequence {
+        (0 until size)
+            .forEach { i ->
+                ((if (withMirrors) 0 else i) until size)
+                    .forEach { j ->
+                        if (withSelf || i != j) {
+                            yield(Pair(list[i], list[j]))
                         }
-                }
-                .sum()
+                    }
+            }
     }
 }
