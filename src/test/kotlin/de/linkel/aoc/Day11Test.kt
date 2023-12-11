@@ -1,13 +1,23 @@
 package de.linkel.aoc
 
-class Day11Test: AbstractDayTest<Int>() {
+class Day11Test: AbstractDayTest<Long>() {
     override val exampleA = """
+...#......
+.......#..
+#.........
+..........
+......#...
+.#........
+.........#
+..........
+.......#..
+#...#.....
         """.trimIndent()
-    override val exampleSolutionA = 0
-    override val solutionA = 0
+    override val exampleSolutionA = 374L
+    override val solutionA = 10154062L
 
-    override val exampleSolutionB = 0
-    override val solutionB = 0
+    override val exampleSolutionB = 8410L
+    override val solutionB = 553083047914L
 
     override val implementation = Day11()
 }
