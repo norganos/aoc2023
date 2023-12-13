@@ -2,10 +2,10 @@ package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
-import de.linkel.aoc.utils.mixins.append
-import de.linkel.aoc.utils.mixins.extend
-import de.linkel.aoc.utils.mixins.intersects
-import de.linkel.aoc.utils.mixins.prepend
+import de.linkel.aoc.utils.iterables.append
+import de.linkel.aoc.utils.iterables.extend
+import de.linkel.aoc.utils.iterables.intersects
+import de.linkel.aoc.utils.iterables.prepend
 import jakarta.inject.Singleton
 
 @Singleton

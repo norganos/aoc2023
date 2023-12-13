@@ -3,6 +3,7 @@ package de.linkel.aoc
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
 import de.linkel.aoc.utils.grid.Point
+import de.linkel.aoc.utils.iterables.combinationPairs
 import jakarta.inject.Singleton
 
 @Singleton
@@ -47,23 +48,5 @@ class Day11: AbstractLinesAdventDay<Long>() {
                     withMirrors = false
                 )
                 .sumOf { (it.first - it.second).manhattenDistance.toLong() }
-    }
-}
-fun <T> List<T>.combinationPairs(
-    withSelf: Boolean = false,
-    withMirrors: Boolean = false
-): Sequence<Pair<T,T>> {
-    val size = this.size
-    val list = this
-    return sequence {
-        (0 until size)
-            .forEach { i ->
-                ((if (withMirrors) 0 else i) until size)
-                    .forEach { j ->
-                        if (withSelf || i != j) {
-                            yield(Pair(list[i], list[j]))
-                        }
-                    }
-            }
     }
 }

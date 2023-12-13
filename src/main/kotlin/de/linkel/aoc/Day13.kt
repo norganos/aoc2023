@@ -2,6 +2,9 @@ package de.linkel.aoc
 
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
+import de.linkel.aoc.utils.iterables.combineWith
+import de.linkel.aoc.utils.iterables.split
+import de.linkel.aoc.utils.replaceIndex
 import jakarta.inject.Singleton
 import kotlin.math.min
 
@@ -25,7 +28,7 @@ class Day13: AbstractLinesAdventDay<Int>() {
                 } else {
                     val mrows = rows.toMutableList()
                     val mcols = cols.toMutableList()
-                    coordinates(rows.size, cols.size)
+                    rows.indices.toList().combineWith(cols.indices.toList())
                         .firstNotNullOf { pos ->
                             val backup = mrows[pos.first][pos.second]
                             val char = if (backup == '#') '.' else '#'
@@ -56,39 +59,5 @@ class Day13: AbstractLinesAdventDay<Int>() {
                     divider
                 else null
             } ?: 0
-    }
-}
-
-fun String.replaceIndex(idx: Int, char: Char): String {
-    return "${this.substring(0, idx)}$char${this.substring(idx+1)}"
-}
-
-fun coordinates(rows: Int, cols: Int): Sequence<Pair<Int, Int>> {
-    return sequence {
-        (0 until rows)
-            .forEach { r ->
-                (0 until cols)
-                    .forEach { c ->
-                            yield(r to c)
-                    }
-            }
-    }
-}
-
-fun <T> Sequence<T>.split(predicate: (T) -> Boolean): Sequence<List<T>> {
-    val input = this
-    return sequence {
-        val buffer = mutableListOf<T>()
-        input.forEach { element ->
-            if (predicate(element)) {
-                yield(buffer.toList())
-                buffer.clear()
-            } else {
-                buffer.add(element)
-            }
-        }
-        if (buffer.isNotEmpty()) {
-            yield(buffer.toList())
-        }
     }
 }
