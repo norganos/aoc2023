@@ -1,10 +1,8 @@
 package de.linkel.aoc
 
-import de.linkel.aoc.base.AbstractFileAdventDay
 import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
 import jakarta.inject.Singleton
-import java.io.BufferedReader
 
 @Singleton
 class Day15: AbstractLinesAdventDay<Int>() {
@@ -47,7 +45,7 @@ class Day15: AbstractLinesAdventDay<Int>() {
     private fun <T> MutableList<T>.removeFirst(predicate: (item: T) -> Boolean): T? {
         val idx = indexOfFirst(predicate)
         return if (idx == -1) null
-        else  removeAt(idx)
+        else removeAt(idx)
     }
 
     private fun hash(token: String): Int = token.fold(0) { hash, char ->
