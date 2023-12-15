@@ -32,7 +32,7 @@ class Day14: AbstractLinesAdventDay<Int>() {
         if (part == QuizPart.A) {
             platform = platform.tilt(Platform.NORTH)
         } else {
-            val lastIterations = mutableListOf<Int>()
+            val lastIterations = mutableListOf<Set<Point>>()
             var i = 0
             while (i < 1_000_000_000) {
                 platform = platform
@@ -40,9 +40,9 @@ class Day14: AbstractLinesAdventDay<Int>() {
                     .tilt(Platform.WEST)
                     .tilt(Platform.SOUTH)
                     .tilt(Platform.EAST)
-                if (platform.rollers.hashCode() in lastIterations) {
-                    val cycleLength = lastIterations.indexOf(platform.rollers.hashCode()) + 1
-                    println("in lastIterations at pos $cycleLength")
+                if (platform.rollers in lastIterations) {
+                    val cycleLength = lastIterations.indexOf(platform.rollers) + 1
+                    println("result from $i found in lastIterations at pos $cycleLength")
                     while (i + cycleLength < 1_000_000_000) {
                         i += cycleLength
                     }
@@ -50,7 +50,7 @@ class Day14: AbstractLinesAdventDay<Int>() {
 
                     lastIterations.clear()
                 }
-                lastIterations.add(0, platform.rollers.hashCode())
+                lastIterations.add(0, platform.rollers)
                 if (lastIterations.size > 500) {
                     lastIterations.removeAt(500)
                 }
