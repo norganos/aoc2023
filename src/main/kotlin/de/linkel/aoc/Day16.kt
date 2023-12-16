@@ -45,29 +45,28 @@ class Day16: AbstractLinesAdventDay<Int>() {
 
     fun run(grid: Grid<Thing>, startBeam: Beam): Int {
         return generateSequence(
-            setOf(startBeam)
-        ) { beams ->
-            beams + beams
-                .asSequence()
-                .map(Beam::step)
-                .filter { it.pos in grid }
-                .map {
-                    it to grid[it.pos]
-                }
-                .flatMap { (beam, thing) ->
-                    thing?.modify(beam) ?: listOf(beam)
-                }
-                .toSet()
+            setOf(startBeam) to emptySet<Beam>()
+        ) { (activeBeams, oldBeams) ->
+            Pair(
+                activeBeams
+                    .asSequence()
+                    .map { it.step() }
+                    .filter { it.pos in grid }
+                    .map {
+                        it to grid[it.pos]
+                    }
+                    .flatMap { (beam, thing) ->
+                        thing?.modify(beam) ?: listOf(beam)
+                    }
+                    .filter { it !in oldBeams }
+                    .toSet(),
+                oldBeams + activeBeams
+                    .filter { it.pos in grid }
+            )
         }
-            .zipWithNext()
-            .takeWhile { (old, new) -> old != new }
-            .map{ (_, new) -> new }
-            .last()
-//            .also {
-//                print(grid, it)
-//            }
-            .map { it.pos }
-            .filter { it in grid }
+            .first { it.first.isEmpty() }
+            .second
+            .map{ it.pos }
             .toSet()
             .count()
     }
