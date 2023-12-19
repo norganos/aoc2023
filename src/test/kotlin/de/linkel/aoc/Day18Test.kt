@@ -21,7 +21,23 @@ U 2 (#7a21e3)
     override val solutionA = 35991L
 
     override val exampleSolutionB = 952408144115L
-    override val solutionB = 0L
+    override val solutionB = 54058824661845L
 
     override val implementation = Day18()
 }
+/*
+
+#######         7 0
+#.....#         2 5
+###...#         4 3
+..#...#         2 3
+..#...#         2 3
+###.###         6 1
+#...#..         2 3
+##..###         5 2
+.#....#         2 4
+.######         6 0
+
+
+
+ */
