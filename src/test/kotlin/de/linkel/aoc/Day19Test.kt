@@ -1,8 +1,6 @@
 package de.linkel.aoc
 
-import java.math.BigInteger
-
-class Day19Test: AbstractDayTest<BigInteger>() {
+class Day19Test: AbstractDayTest<Long>() {
     override val exampleA = """
 px{a<2006:qkq,m>2090:A,rfg}
 pv{a>1716:R,A}
@@ -22,11 +20,11 @@ hdj{m>838:A,pv}
 {x=2461,m=1339,a=466,s=291}
 {x=2127,m=1623,a=2188,s=1013}
         """.trimIndent()
-    override val exampleSolutionA = 19114L.toBigInteger()
-    override val solutionA = 374873L.toBigInteger()
+    override val exampleSolutionA = 19114L
+    override val solutionA = 374873L
 
-    override val exampleSolutionB = 167409079868000L.toBigInteger()
-    override val solutionB = BigInteger("122112157518711")
+    override val exampleSolutionB = 167409079868000L
+    override val solutionB = 122112157518711L
 
     override val implementation = Day19()
 }

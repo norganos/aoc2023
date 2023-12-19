@@ -4,10 +4,9 @@ import de.linkel.aoc.base.AbstractLinesAdventDay
 import de.linkel.aoc.base.QuizPart
 import de.linkel.aoc.utils.iterables.intersect
 import jakarta.inject.Singleton
-import java.math.BigInteger
 
 @Singleton
-class Day19: AbstractLinesAdventDay<BigInteger>() {
+class Day19: AbstractLinesAdventDay<Long>() {
     override val day = 19
 
     enum class Op(val char: Char, val lambda: (value: Int, threshold: Int) -> Boolean) {
@@ -50,7 +49,7 @@ class Day19: AbstractLinesAdventDay<BigInteger>() {
         }
     }
 
-    override fun process(part: QuizPart, lines: Sequence<String>): BigInteger {
+    override fun process(part: QuizPart, lines: Sequence<String>): Long {
         val iterator = lines.iterator()
         val rulePattern = Regex("([xmas])([<>])([0-9]+):([a-zAR]+)")
         val workflows = iterator
@@ -84,50 +83,12 @@ class Day19: AbstractLinesAdventDay<BigInteger>() {
                 }
                 .filter { (_, dest) -> dest == "A" }
                 .sumOf { (machinePart, _) -> machinePart.values.sum() }
-                .toBigInteger()
+                .toLong()
         } else {
             searchPathes(workflows, listOf("in"), mapOf("x" to 1..4000, "m" to 1..4000, "a" to 1..4000, "s" to 1..4000))
                 .sumOf {
-                    vc -> vc.values.fold(BigInteger.ONE) { p, r -> p * (r.last - r.first + 1).toBigInteger() }
+                    vc -> vc.values.fold(1L) { p, r -> p * (r.last - r.first + 1).toLong() }
                 }
-//            listOf("x","m","a","s")
-//                .map { prop ->
-//                    prop to validConstraints.fold(listOf(1..4000)) { existing, constraint ->
-//                        val range = constraint[prop]!!
-//                        buildList {
-//                            existing
-//                                .sortedBy { it.first }
-//                                .forEach { r ->
-//                                    if (r.last < range.first || r.first > range.last || r == range) {
-//                                        add(r)
-//                                    } else {
-//                                        add(r.first until range.first)
-//                                        add(max(r.first, range.first)..min(r.last, range.last))
-//                                        add((range.last + 1)..r.last)
-//                                    }
-//                                }
-//                        }
-//                        .filter { !it.isEmpty() }
-//                    }
-//                }
-//                .map { prop ->
-//                    prop.second
-//                        .map {
-//                            prop.first to it
-//                        }
-//                }
-//                .combinations()
-//                .filter { combination ->
-//                    validConstraints.any { constraint ->
-//                        combination.all { prop ->
-//                            prop.second.first >= constraint[prop.first]!!.first && prop.second.last <= constraint[prop.first]!!.last
-//                        }
-//                    }
-//                }
-//                .map { combination ->
-//                    combination.fold(BigInteger.ONE) { product, prop -> product * (prop.second.last - prop.second.first + 1).toBigInteger()}
-//                }
-//                .sumOf { it }
         }
     }
     fun Map<String,IntRange>.constraintBy(rule: Rule): Map<String,IntRange> {
