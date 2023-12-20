@@ -9,5 +9,5 @@ class Day21Test: AbstractDayTest<Int>() {
     override val exampleSolutionB = 0
     override val solutionB = 0
 
-    override val implementation = Day20()
+    override val implementation = Day21()
 }
