@@ -76,7 +76,7 @@ class Day21: AbstractLinesAdventDay<Long>() {
                     if (it in area)
                         it !in rocks
                     else {
-                        val p = Point(it.x.rem(area.width), it.y.rem(area.height))
+                        val p = Point(it.x.mod(area.width), it.y.mod(area.height))
                         p in area && p !in rocks
                     }
                 }
