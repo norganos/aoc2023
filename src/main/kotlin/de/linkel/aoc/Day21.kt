@@ -33,7 +33,7 @@ class Day21: AbstractLinesAdventDay<Long>() {
 
         val area = Area(0, 0, width, height)
         return if (part == QuizPart.A)
-            dijkstra1(area, rocks, start, if (width < 15) 6 else 64).size.toLong()
+            dijkstra(area, rocks, start, if (width < 15) 6 else 64)
         else {
             assert(width == height)
             assert(width % 2 == 1)
@@ -42,17 +42,9 @@ class Day21: AbstractLinesAdventDay<Long>() {
             val step = width * 2
             val rem = max % step
 
-            if (width < 15) {
-                println("  6: ${dijkstra2(area, rocks, start, 6)}")
-                println(" 10: ${dijkstra2(area, rocks, start, 10)}")
-                println(" 50: ${dijkstra2(area, rocks, start, 50)}")
-                println("100: ${dijkstra2(area, rocks, start, 100)}")
-                println("500: ${dijkstra2(area, rocks, start, 500)}")
-            }
-
             val probe = 5
             (0..probe)
-                .map { i -> dijkstra2(area, rocks, start, step * i + rem) }
+                .map { i -> dijkstra(area, rocks, start, step * i + rem) }
                 .toSeq()
                 .prepare()
                 .toExtrapolation()
@@ -60,38 +52,7 @@ class Day21: AbstractLinesAdventDay<Long>() {
         }
     }
 
-    fun dijkstra1(area: Area, rocks: Set<Point>, start: Point, max: Int): Set<Point> {
-        val queue = PriorityQueue<Pair<Point, Int>>(compareBy { it.second })
-        queue.add(start to 0)
-        val seen = mutableSetOf(start)
-        val visited = mutableSetOf<Point>()
-        while (queue.isNotEmpty()) {
-            val (point, distance) = queue.remove()
-            if (distance > max) {
-                break
-            }
-            if (distance % 2 == max % 2) {
-                visited.add(point)
-            }
-
-            listOf(
-                point + NORTH,
-                point + WEST,
-                point + SOUTH,
-                point + EAST
-            )
-                .filter { it in area }
-                .filter { it !in rocks }
-                .filter { it !in seen }
-                .forEach {
-                    queue.add(it to distance + 1)
-                    seen.add(it)
-                }
-        }
-        return visited
-    }
-
-    fun dijkstra2(area: Area, rocks: Set<Point>, start: Point, max: Int): Long {
+    fun dijkstra(area: Area, rocks: Set<Point>, start: Point, max: Int): Long {
         val queue = PriorityQueue<Pair<Point, Int>>(compareBy { it.second })
         queue.add(start to 0)
         val seen = mutableSetOf(start)
@@ -115,7 +76,7 @@ class Day21: AbstractLinesAdventDay<Long>() {
                     if (it in area)
                         it !in rocks
                     else {
-                        val p = Point(it.x pmod area.width, it.y pmod area.height)
+                        val p = Point(it.x.rem(area.width), it.y.rem(area.height))
                         p in area && p !in rocks
                     }
                 }
@@ -126,13 +87,6 @@ class Day21: AbstractLinesAdventDay<Long>() {
                 }
         }
         return count
-    }
-
-    private infix fun Int.pmod(other: Int): Int {
-        val result = this % other
-        return if (result < 0)
-            result + other
-        else result
     }
 
     private fun List<Long>.toSeq(): Seq = Seq(this)
