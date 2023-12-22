@@ -22,5 +22,3 @@ class Day21Test: AbstractDayTest<Long>() {
 
     override val implementation = Day21()
 }
-// 6872
-// 3774

@@ -6,6 +6,7 @@ import de.linkel.aoc.utils.grid.Area
 import de.linkel.aoc.utils.grid.Point
 import jakarta.inject.Singleton
 import java.util.*
+import kotlin.time.measureTimedValue
 
 @Singleton
 class Day21: AbstractLinesAdventDay<Long>() {
@@ -33,7 +34,7 @@ class Day21: AbstractLinesAdventDay<Long>() {
 
         val area = Area(0, 0, width, height)
         return if (part == QuizPart.A)
-            dijkstra(area, rocks, start, if (width < 15) 6 else 64)
+            dijkstra(area, rocks, start, listOf(if (width < 15) 6 else 64)).first()
         else {
             assert(width == height)
             assert(width % 2 == 1)
@@ -43,50 +44,63 @@ class Day21: AbstractLinesAdventDay<Long>() {
             val rem = max % step
 
             val probe = 5
-            (0..probe)
-                .map { i -> dijkstra(area, rocks, start, step * i + rem) }
-                .toSeq()
-                .prepare()
-                .toExtrapolation()
-                .extrapolate((max - rem) / step - probe)
+            val probed = measureTimedValue {
+                dijkstra(area, rocks, start, (1..probe).map { i -> step * i + rem })
+            }.let {
+                println("finding took ${it.duration}")
+                it.value
+            }
+
+            measureTimedValue {
+                probed
+                    .toSeq()
+                    .prepare()
+                    .toExtrapolation()
+                    .extrapolate((max - rem) / step - probe)
+            }.let {
+                println("extrapolating took ${it.duration}")
+                it.value
+            }
         }
     }
 
-    fun dijkstra(area: Area, rocks: Set<Point>, start: Point, max: Int): Long {
+    fun dijkstra(area: Area, rocks: Set<Point>, start: Point, max: List<Int>): List<Long> {
         val queue = PriorityQueue<Pair<Point, Int>>(compareBy { it.second })
+        val result = mutableMapOf<Int,Long>()
+        val saveSteps = max.map { it + 1 }.toMutableSet()
         queue.add(start to 0)
         val seen = mutableSetOf(start)
-        var count = 0L
+        var odd = 0L
+        var even = 0L
+        val maxMax = max.max()
+        val dirs = listOf(
+                NORTH,
+                WEST,
+                SOUTH,
+                EAST
+            ).asSequence()
         while (queue.isNotEmpty()) {
             val (point, distance) = queue.remove()
-            if (distance > max) {
+            if (distance in saveSteps) {
+                result[distance-1] = if ((distance - 1) %2 == 0) even else odd
+                saveSteps.remove(distance)
+            }
+            if (distance > maxMax) {
                 break
             }
-            if (distance % 2 == max % 2) {
-                count++
-            }
+            if (distance % 2 == 0) even++ else odd++
 
-            listOf(
-                point + NORTH,
-                point + WEST,
-                point + SOUTH,
-                point + EAST
-            )
+            dirs
+                .map { point + it }
                 .filter {
-                    if (it in area)
-                        it !in rocks
-                    else {
-                        val p = Point(it.x.mod(area.width), it.y.mod(area.height))
-                        p in area && p !in rocks
-                    }
+                    Point(it.x.mod(area.width), it.y.mod(area.height)) !in rocks && it !in seen
                 }
-                .filter { it !in seen }
                 .forEach {
                     queue.add(it to distance + 1)
                     seen.add(it)
                 }
         }
-        return count
+        return max.map { result[it]!! }
     }
 
     private fun List<Long>.toSeq(): Seq = Seq(this)
