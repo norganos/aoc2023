@@ -2,12 +2,45 @@ package de.linkel.aoc
 
 class Day23Test: AbstractDayTest<Int>() {
     override val exampleA = """
+#.#####################
+#.......#########...###
+#######.#########.#.###
+###.....#.>.>.###.#.###
+###v#####.#v#.###.#.###
+###.>...#.#.#.....#...#
+###v###.#.#.#########.#
+###...#.#.#.......#...#
+#####.#.#.#######.#.###
+#.....#.#.#.......#...#
+#.#####.#.#.#########v#
+#.#...#...#...###...>.#
+#.#.#v#######v###.###v#
+#...#.>.#...>.>.#.###.#
+#####v#.#.###v#.#.###.#
+#.....#...#...#.#.#...#
+#.#########.###.#.#.###
+#...###...#...#...#.###
+###.###.#.###v#####v###
+#...#...#.#.>.>.#.>.###
+#.###.###.#.###.#.#v###
+#.....###...###...#...#
+#####################.#
         """.trimIndent()
-    override val exampleSolutionA = 0
-    override val solutionA = 0
+    override val exampleSolutionA = 94
+    override val solutionA = 2050
 
-    override val exampleSolutionB = 0
-    override val solutionB = 0
+    override val exampleSolutionB = 154
+    override val solutionB = 6262
 
     override val implementation = Day23()
 }
+/* wrong results:
+5459
+5587
+5723   5907
+7186
+7470
+7566
+7690
+*/
+
