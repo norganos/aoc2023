@@ -47,6 +47,35 @@ class Day24: AbstractLinesAdventDay<Int>() {
         } else 0
     }
 
+    /*  # gesucht: p: Projectile(position: Point3d, velocity: Vector3d)
+        # gegeben: n hailStones h[0] bis h[n-1]
+        #          kollision mit h[x] in t[x]
+
+        t[?] > 0
+        p.position + p.velocity * t[0] = h[0].position + h[0].velocity * t[0]
+        p.position + p.velocity * t[1] = h[1].position + h[1].velocity * t[1]
+        ...
+
+        # 7 unbekannte, 3 gleichungen
+        p.pos.x + p.vel.dx * t[0] = h[0].pos.x + h[0].vel.dx * t[0]
+        p.pos.y + p.vel.dy * t[0] = h[0].pos.y + h[0].vel.dy * t[0]
+        p.pos.z + p.vel.dz * t[0] = h[0].pos.z + h[0].vel.dz * t[0]
+
+        # 7 unbekannte, 3 gleichungen
+        p.pos.x + p.vel.dx * t[1] = h[1].pos.x + h[1].vel.dx * t[1]
+        p.pos.y + p.vel.dy * t[1] = h[1].pos.y + h[1].vel.dy * t[1]
+        p.pos.z + p.vel.dz * t[1] = h[1].pos.z + h[1].vel.dz * t[1]
+
+        # jeder hagelstein erhöht gleichungen um 3, erhöht unbekannte aber nur um 1
+        # hagelstein | unbekannte | gleichungen
+        # 1          | 7          | 3
+        # 2          | 8          | 6
+        # 3          | 9          | 9
+        # => nach 3 hagelkörnern sollte das system lösbar sein
+
+
+     */
+
     data class Point2d(val x: Double, val y: Double) {
         operator fun plus(vector: Vector2d) = copy(x + vector.deltaX, y + vector.deltaY)
         operator fun minus(other: Point2d) = Vector2d(x - other.x, y - other.y)
