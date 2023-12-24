@@ -11,7 +11,7 @@ class Day24Test: AbstractDayTest<Int>() {
     override val exampleSolutionA = 2
     override val solutionA = 16050
 
-    override val exampleSolutionB = 0
+    override val exampleSolutionB = 47
     override val solutionB = 0
 
     override val implementation = Day24()

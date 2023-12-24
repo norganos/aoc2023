@@ -25,40 +25,26 @@ class Day24: AbstractLinesAdventDay<Int>() {
                     velocity = Vector3d(dx, dy, dz)
                 )
             }
-            .map { it.toProjection() }
-            .toList()
-        val xyRange = if (hailStones.size < 10) (7L..27L) else (200000000000000L..400000000000000L)
-        return hailStones
-            .mapIndexed{ idx,hailStone ->
-                hailStones
-                    .drop(idx + 1)
-                    .count {
-                        val p = hailStone.intersection(it)
-                        if (p != null) {
-                            if (hailStone.velocity.sameDir(p - hailStone.position)) {
-                                if (it.velocity.sameDir(p - it.position)) {
-                                    if (p.x >= xyRange.first && p.x <= xyRange.last && p.y >= xyRange.first && p.y <= xyRange.last) {
-                                        println("intersect: $hailStone and $it at $p")
-                                        true
-                                    } else {
-                                        println("intersect outside: $hailStone and $it at $p")
-                                        false
-                                    }
-                                } else {
-                                    println("intersect in the past of b: $hailStone and $it")
-                                    false
-                                }
-                            } else {
-                                println("intersect in the past of a: $hailStone and $it")
-                                false
-                            }
-                        } else {
-                            println("don't intersect: $hailStone and $it")
-                            false
-                        }
-                    }
-            }
-            .sum()
+        return if (part == QuizPart.A) {
+            val hailStoneProjections = hailStones
+                .map { it.toProjection() }
+                .toList()
+            val xyRange = if (hailStoneProjections.size < 10) (7L..27L) else (200000000000000L..400000000000000L)
+            hailStoneProjections
+                .mapIndexed{ idx,hailStone ->
+                    hailStoneProjections
+                        .drop(idx + 1)
+                        .asSequence()
+                        .map { hailStone.intersection(it) to it }
+                        .filter { (p, _) -> p != null }
+                        .map { (p, o) -> p!! to o }
+                        .filter { (p, _) -> p.x >= xyRange.first && p.x <= xyRange.last && p.y >= xyRange.first && p.y <= xyRange.last }
+                        .filter { (p, _) -> hailStone.velocity.sameDir(p - hailStone.position) }
+                        .filter { (p, o) -> o.velocity.sameDir(p - o.position) }
+                        .count()
+                }
+                .sum()
+        } else 0
     }
 
     data class Point2d(val x: Double, val y: Double) {
